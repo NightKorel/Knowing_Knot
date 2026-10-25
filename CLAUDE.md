@@ -131,7 +131,8 @@
 
 ## 專案技術備註（沿用前幾攤的習慣，方向定了再調整）
 
-- 純 HTML／CSS／原生 JavaScript，不用框架、不用建置。
+- 2026-10-25 納可定：用 Twine（SugarCube 寫法）做。Claude 點不到 Twine 的編輯畫面，所以故事寫成純文字的 `.twee` 檔，用 npm 的 extwee 轉成網頁：`npx extwee -c -i 故事.twee -s lib/sugarcube-2.37.3-format.js -o index.html`。轉出來的網頁納可也能匯入 Twine 程式自己改。
+- SugarCube 本體放在 `lib/sugarcube-2.37.3-format.js`（官網被擋，從 GitHub 的 v2.37.3 版抓的）。
 - 外部函式庫放 `lib/`，從 npm 抓下來放進 repo，不用 CDN（雲端環境連 CDN 會被擋）。
 - 測試腳本在 `tools/`，用法寫進 `tools/說明.md`。部署用 GitHub Pages，從 main 根目錄發佈（要放 `.nojekyll`），根目錄的 `index.html` 就是首頁。
 - 存檔放瀏覽器 localStorage（存檔太大再改 IndexedDB），可匯出匯入 JSON。
