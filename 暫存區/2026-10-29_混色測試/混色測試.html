@@ -1,0 +1,30 @@
+<!doctype html><meta charset="utf-8">
+<style>body{font-family:sans-serif;background:#fff;margin:16px;width:760px}
+.row{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:14px}
+.sw{width:56px;height:40px;border-radius:6px;border:1px solid #ccc;flex:none}
+.lab{width:220px}.sm{font-size:12px;color:#666;width:70px}
+h3{margin:14px 0 4px}</style>
+<script src="../../lib/spectral-3.0.0.js"></script>
+<body><script>
+const P={黃:'#FCD200',藍:'#002185',紅:'#E0201B',白:'#F5F5F0',黑:'#1A1A1A',綠:'#0F7A3A'};
+const C=k=>new spectral.Color(P[k]);
+const hex2=a=>'#'+a.map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+const rgbAvg=parts=>{let t=0,s=[0,0,0];for(const[k,n]of parts){const h=P[k];for(let i=0;i<3;i++)s[i]+=parseInt(h.substr(1+2*i,2),16)*n;t+=n}return hex2(s.map(v=>v/t))};
+const mixS=(parts,strong={})=>spectral.mix(...parts.map(([k,n])=>{const c=C(k);if(strong[k])c.tintingStrength=strong[k];return[c,n]})).toString();
+const sw=c=>`<div class=sw style="background:${c}"></div>`;
+const name=p=>p.map(([k,n])=>`${k}${n}坨`).join(' + ');
+let h='<h3>顏料</h3><div class=row>'+Object.entries(P).map(([k,c])=>sw(c)+k).join(' ')+'</div>';
+h+='<h3>同樣的坨數：電腦平均 vs 模擬顏料</h3><div class=row><span class=lab></span><span class=sm>電腦平均</span><span class=sm></span><span class=sm>模擬顏料</span></div>';
+for(const p of [[['黃',1],['藍',1]],[['紅',1],['黃',1]],[['紅',1],['藍',1]],[['紅',1],['綠',1]],[['紅',1],['白',3]],[['藍',1],['白',3]],[['黃',3],['藍',1]],[['黃',1],['藍',3]],[['黃',1],['紅',1],['藍',1]]])
+  h+=`<div class=row><span class=lab>${name(p)}</span>${sw(rgbAvg(p))}<span class=sm></span>${sw(mixS(p))}</div>`;
+h+='<h3>顏料力氣：藍色調強／調弱（黃1坨 + 藍1坨）</h3><div class=row>';
+for(const t of [0.3,0.6,1,2,4])h+=sw(mixS([['黃',1],['藍',1]],{藍:t}))+`藍力氣${t}　`;
+h+='</div>';
+const target=new spectral.Color(mixS([['藍',1],['白',4]]));
+const dist=(a,b)=>Math.hypot(...a.OKLab.map((v,i)=>v-b.OKLab[i]));
+h+='<h3>接近度示範：目標「冰」＝藍1 + 白4</h3>';
+for(const p of [[['藍',1],['白',4]],[['藍',1],['白',3]],[['藍',1],['白',6]],[['藍',1],['白',1]],[['綠',1],['白',4]],[['黃',1],['白',2]]]){
+  const c=new spectral.Color(mixS(p));const d=dist(c,target);const pct=Math.max(0,Math.round(100-d*400));
+  h+=`<div class=row><span class=lab>${name(p)}</span>${sw(target.toString())}${sw(c.toString())}<span>差距 ${d.toFixed(3)}　示範換算 ${pct}%</span></div>`}
+document.body.innerHTML=h;
+</script>
